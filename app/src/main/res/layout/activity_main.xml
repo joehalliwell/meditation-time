@@ -5,32 +5,46 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".MainActivity">
+        tools:context=".MainActivity" android:background="@color/background"
+        android:padding="20dp">
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0">
-
-        <fragment
-            android:id="@+id/settings_fragment"
-            android:name="com.joehalliwell.meditationtime.SettingsFragment"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <Button
-            android:id="@+id/go"
-            android:text="Let's go!"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="selectTime"
-            />
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.5">
+
+        <com.joehalliwell.meditationtime.TimerView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:id="@+id/timerView" app:exampleString="Hello world"
+                app:exampleColor="#1A1414"
+                app:exampleDimension="10dp" android:padding="5dp"
+        />
+        <TextView
+                android:text="TextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:id="@+id/textView"
+                android:textAppearance="@style/TextAppearance.AppCompat.Display4" android:textAlignment="center"
+                android:textSize="80sp" android:textColor="@color/detail" android:fontFamily="sans-serif-thin"/>
+        <Button
+                android:id="@+id/go"
+                android:text="Start"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="start"
+                android:backgroundTint="@color/background"
+                android:textColor="@color/detail"/>
+        <Button
+                android:text="Stop"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:id="@+id/stop" android:onClick="stop"
+                android:backgroundTint="@color/background"
+                android:textColor="@color/detail"/>
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
