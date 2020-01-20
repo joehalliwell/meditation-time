@@ -1,18 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen  xmlns:a="http://schemas.android.com/apk/res-auto">
+    <PreferenceCategory
+            a:title="@string/messages_header">
 
-    <ListPreference
-        android:title="Duration"
-        android:key="duration"
-        android:entries="@array/durationNames"
-        android:entryValues="@array/durations"
-        android:summary="%s"
+        <ListPreference
+        a:title="Duration"
+        a:key="xduration"
+        a:entries="@array/durationNames"
+        a:entryValues="@array/durations"
+        a:summary="%s"
         />
 
 
     <SwitchPreference
-        android:title="Interval bells"
-        android:key="interval_bells"
-        android:summary="Play four chimes" />
+        a:title="Interval bells"
+        a:key="interval_bells"
+        a:summary="Play four chimes" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+            a:title="@string/messages_header">
+
+        <EditTextPreference
+                a:key="signature"
+                a:title="@string/signature_title"
+                />
+
+        <ListPreference
+                a:key="reply"
+                a:title="@string/reply_title"
+                a:entries="@array/reply_entries"
+                a:entryValues="@array/reply_values"
+                a:defaultValue="reply"
+                />
+
+    </PreferenceCategory>
 
 </PreferenceScreen>

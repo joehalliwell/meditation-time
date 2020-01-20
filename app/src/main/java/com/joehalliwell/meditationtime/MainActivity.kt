@@ -1,5 +1,6 @@
 package com.joehalliwell.meditationtime
 
+import android.content.Intent
 import android.content.SharedPreferences
 import android.content.SharedPreferences.Editor
 import android.media.SoundPool
@@ -7,6 +8,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.util.Log
 import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -14,7 +16,7 @@ import androidx.preference.PreferenceManager
 import kotlin.math.roundToLong
 
 
-class MainActivity : AppCompatActivity(), TimerTouchListener, Runnable {
+class MainActivity : AppCompatActivity(), TimerViewListener, Runnable {
 
     val TAG = "MeditationTime"
 
@@ -29,7 +31,8 @@ class MainActivity : AppCompatActivity(), TimerTouchListener, Runnable {
     private var _stage = -1
 
     private lateinit var timerView: TimerView
-    private lateinit var textView: TextView
+    private lateinit var timerTextView: TextView
+    private lateinit var extraTimeTextView: TextView
     private lateinit var preferences: SharedPreferences
     private lateinit var soundPool: SoundPool
     private val soundBank = HashMap<Int, Int>()
@@ -45,21 +48,21 @@ class MainActivity : AppCompatActivity(), TimerTouchListener, Runnable {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        preferences = PreferenceManager.getDefaultSharedPreferences(this)
+
         setContentView(R.layout.activity_main)
-
-        textView = findViewById<TextView>(R.id.textView)
-
+        timerTextView = findViewById<TextView>(R.id.timeTextView)
+        extraTimeTextView = findViewById<TextView>(R.id.extraTimeTextView)
         timerView = findViewById<TimerView>(R.id.timerView)
         timerView.setListener(this);
 
-        preferences = PreferenceManager.getDefaultSharedPreferences(this)
-        soundPool = SoundPool.Builder().build()
-
+        soundPool = SoundPool.Builder()
+            .setMaxStreams(3)
+            .build()
         for (resId in arrayOf(R.raw.start, R.raw.mid, R.raw.end, R.raw.post)) {
             soundBank[resId] = soundPool.load(this, resId, 1)
         }
-
-
 
         try {
             duration = preferences.getLong("duration", maximumDuration / 3)
@@ -67,6 +70,7 @@ class MainActivity : AppCompatActivity(), TimerTouchListener, Runnable {
         catch (ex: ClassCastException) {
             duration = maximumDuration / 3
         }
+
     }
 
     override fun onDestroy() {
@@ -78,6 +82,38 @@ class MainActivity : AppCompatActivity(), TimerTouchListener, Runnable {
         val inflater = menuInflater
         inflater.inflate(R.menu.options, menu)
         return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        Log.i(TAG, "Settings")
+        return when (item.itemId) {
+            R.id.settings_button -> {
+                val intent = Intent(this, PreferencesActivity::class.java)
+                startActivity(intent)
+                return true
+            }
+            else -> super.onContextItemSelected(item)
+        }
+    }
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus) hideSystemUI()
+    }
+
+    private fun hideSystemUI() {
+        window.decorView.apply {
+            // Hide both the navigation bar and the status bar.
+            // SYSTEM_UI_FLAG_FULLSCREEN is only available on Android 4.1 and higher, but as
+            // a general rule, you should design your app to hide the status bar whenever you
+            // hide the navigation bar.
+            systemUiVisibility =
+                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
+                View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
+                View.SYSTEM_UI_FLAG_FULLSCREEN or
+                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
+                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+        }
     }
 
     private fun isRunning(): Boolean = _start > 0
@@ -99,17 +135,21 @@ class MainActivity : AppCompatActivity(), TimerTouchListener, Runnable {
         updateViews()
     }
 
-    override fun onTimerTouch(position: Float) {
+    override fun onDialTouch(position: Float) {
         Log.i(TAG, "Got touch at " + position)
 
         if (isRunning()) return
 
         var d = position
-        if (d <= 0) d+= 1
+        if (d <= 0) d+= 1.0f
         duration = (maximumDuration * d).roundToLong()
         Log.i(TAG, "Duration: " + duration)
     }
 
+    override fun onHubTouch() {
+        if (!isRunning()) start(this.timerView)
+        else stop(this.timerView)
+    }
 
     override fun run() {
         if (!isRunning()) return
@@ -124,7 +164,7 @@ class MainActivity : AppCompatActivity(), TimerTouchListener, Runnable {
             _stage = targetStage
             playSoundForStage(targetStage)
         }
-        if (_stage == _segments && !runOn) stop(this.textView)
+        if (_stage == _segments && !runOn) stop(this.timerTextView)
 
         updateViews()
 
@@ -133,15 +173,26 @@ class MainActivity : AppCompatActivity(), TimerTouchListener, Runnable {
 
 
     private fun updateViews() {
-        timerView?.duration = _duration.toFloat() / maximumDuration
-        timerView?.elapsed = _elapsed.toFloat() / maximumDuration
-        textView.setText(getHoursAndMinutes(_duration - _elapsed))
+        // Update timerView
+        timerView.apply {
+            duration = _duration.toFloat() / maximumDuration
+            elapsed = _elapsed.toFloat() / maximumDuration
+        }
+
+        // Update textView
+        timerTextView.setText(getHoursAndMinutes(_duration, _elapsed))
+        extraTimeTextView.setText(if (_elapsed > _duration) "+" else "")
     }
 
-    private fun getHoursAndMinutes(elapsed: Long): String {
-        val minutes = elapsed / 60000
-        val seconds = (elapsed % 60000) / 1000
-        return String.format("%02d:%02d",  minutes, seconds)
+    private fun getHoursAndMinutes(duration: Long, elapsed: Long): String {
+        val t = Math.abs(duration - elapsed)
+        val minutes = t / 60000
+        val seconds = (t % 60000) / 1000
+        return String.format(
+            "%02d:%02d",
+            minutes,
+            seconds
+        )
     }
 
     private fun playSoundForStage(stage: Int) {

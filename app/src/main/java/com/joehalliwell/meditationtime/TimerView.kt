@@ -17,13 +17,14 @@ import androidx.core.math.MathUtils
 class TimerView : View {
 
     private val TAG = "TimerView"
+    private val HUB_RADIUS = 0.1f;
 
     // Pre-allocated view stuff
     private var _clockRect: RectF = RectF(0f, 0f, 100f, 100f)
     private lateinit var _path: Path
     private lateinit var _painter: Paint
 
-    private var _listener: TimerTouchListener? = null
+    private var _listener: TimerViewListener? = null
     private var _duration = 1.0f / 3
     private var _elapsed = 0f
 
@@ -59,7 +60,7 @@ class TimerView : View {
         init(attrs, defStyle)
     }
 
-    fun setListener(listener: TimerTouchListener) {
+    fun setListener(listener: TimerViewListener) {
         this._listener = listener
     }
 
@@ -68,11 +69,18 @@ class TimerView : View {
             MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE -> {
                 val relX = event.x - width / 2
                 val relY = height / 2 - event.y
+                val hub = HUB_RADIUS * width
+
+                if (relX*relX + relY*relY < hub*hub) {
+                    if (event.actionMasked == MotionEvent.ACTION_DOWN) _listener?.onHubTouch()
+                    return true
+                }
+
                 val quantize = 1.0f
                 val angle =
                     quantize * Math.round(Math.toDegrees(Math.atan2(relX.toDouble(), relY.toDouble())) / quantize)
                 Log.i(TAG, "Angle " + angle)
-                _listener?.onTimerTouch(angle/360)
+                _listener?.onDialTouch(angle/360)
                 return true
             }
         }
@@ -139,7 +147,7 @@ class TimerView : View {
 
         canvas.save()
         canvas.translate(_clockRect.centerX(), _clockRect.centerY())
-        canvas.drawCircle(0f, 0f, _clockRect.width() / 10, _painter)
+        canvas.drawCircle(0f, 0f, HUB_RADIUS * _clockRect.width(), _painter)
         canvas.rotate( 360 * (duration - elapsed))
         canvas.drawPath(_path, _painter)
         canvas.restore()
