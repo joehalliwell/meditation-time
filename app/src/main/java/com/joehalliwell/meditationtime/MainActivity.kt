@@ -71,6 +71,11 @@ class MainActivity : AppCompatActivity(), TimerViewListener, Runnable {
             duration = maximumDuration / 3
         }
 
+        reset()
+
+        // Remove app name from action bar
+        supportActionBar?.setDisplayShowTitleEnabled(false)
+        supportActionBar?.setDisplayShowHomeEnabled(false)
     }
 
     override fun onDestroy() {
@@ -116,29 +121,10 @@ class MainActivity : AppCompatActivity(), TimerViewListener, Runnable {
         }
     }
 
-    private fun isRunning(): Boolean = _start > 0
-
-    fun start(view: View) {
-        if (isRunning()) return
-        _start = System.currentTimeMillis()
-        _stage = -1
-        val editor: Editor = preferences.edit()
-        editor.putLong("duration", duration)
-        editor.commit()
-        timerHandler.postDelayed(this, 0)
-    }
-
-    fun stop(view: View) {
-        timerHandler.removeCallbacks(this)
-        _start = 0
-        _elapsed = 0
-        updateViews()
-    }
-
     override fun onDialTouch(position: Float) {
-        Log.i(TAG, "Got touch at " + position)
-
         if (isRunning()) return
+
+        Log.i(TAG, "Got touch at " + position)
 
         var d = position
         if (d <= 0) d+= 1.0f
@@ -147,8 +133,32 @@ class MainActivity : AppCompatActivity(), TimerViewListener, Runnable {
     }
 
     override fun onHubTouch() {
-        if (!isRunning()) start(this.timerView)
-        else stop(this.timerView)
+        if (!isRunning()) start()
+        else pause()
+    }
+
+    private fun isRunning(): Boolean = _start > 0
+
+    fun start() {
+        if (isRunning()) return
+        _start = System.currentTimeMillis()
+        val editor: Editor = preferences.edit()
+        editor.putLong("duration", duration)
+        editor.commit()
+        timerHandler.postDelayed(this, 0)
+    }
+
+    fun reset() {
+        _stage = -1
+        _elapsed = 0
+        pause()
+    }
+    fun resetClickHandler(view: View) = reset()
+
+    fun pause() {
+        _start = 0
+        timerHandler.removeCallbacks(this)
+        updateViews()
     }
 
     override fun run() {
@@ -164,7 +174,7 @@ class MainActivity : AppCompatActivity(), TimerViewListener, Runnable {
             _stage = targetStage
             playSoundForStage(targetStage)
         }
-        if (_stage == _segments && !runOn) stop(this.timerTextView)
+        if (_stage == _segments && !runOn) reset()
 
         updateViews()
 
