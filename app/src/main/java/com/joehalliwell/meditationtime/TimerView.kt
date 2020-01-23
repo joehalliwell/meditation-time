@@ -90,8 +90,8 @@ class TimerView : View {
     override fun onTouchEvent(event: MotionEvent): Boolean {
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE -> {
-                val relX = event.x - width / 2
-                val relY = height / 2 - event.y
+                val relX = event.x - _clockRect.centerX()
+                val relY = _clockRect.centerY() - event.y
                 val hub = HUB_RADIUS * width
 
                 if (relX*relX + relY*relY < hub*hub) {
@@ -118,7 +118,7 @@ class TimerView : View {
         val width = MeasureSpec.getSize(widthMeasureSpec)
         val height = MeasureSpec.getSize(heightMeasureSpec)
         val size = if (width > height) height else width
-        //Log.i(TAG, "Size: %d".format(size))
+        Log.i(TAG, "Size: %d".format(size))
         setMeasuredDimension(size, size)
     }
 
