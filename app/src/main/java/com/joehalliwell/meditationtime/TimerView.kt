@@ -3,6 +3,7 @@ package com.joehalliwell.meditationtime
 import android.content.Context
 import android.graphics.*
 import android.graphics.Paint.ANTI_ALIAS_FLAG
+import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.util.Log
 import android.view.MotionEvent
@@ -20,13 +21,15 @@ class TimerView : View {
     private val HUB_RADIUS = 0.1f;
 
     // Pre-allocated view stuff
-    private var _clockRect: RectF = RectF(0f, 0f, 100f, 100f)
-    private lateinit var _path: Path
+    private lateinit var _clockRect: RectF
+    private lateinit var _pointerPath: Path
     private lateinit var _painter: Paint
 
     private var _listener: TimerViewListener? = null
-    private var _duration = 1.0f / 3
+    private var _duration = 0.5f
     private var _elapsed = 0f
+
+    private lateinit var _overlay: Drawable
 
     @ColorInt private var _bgColor: Int = resources.getColor(R.color.clockface)
     @ColorInt private var _pointerColor = resources.getColor(R.color.detail)
@@ -47,6 +50,12 @@ class TimerView : View {
             invalidate()
         }
 
+    var overlay: Drawable
+        get() = _overlay
+        set(value) {
+            _overlay = value
+            invalidate()
+        }
 
     constructor(context: Context) : super(context) {
         init(null, 0)
@@ -58,6 +67,20 @@ class TimerView : View {
 
     constructor(context: Context, attrs: AttributeSet, defStyle: Int) : super(context, attrs, defStyle) {
         init(attrs, defStyle)
+    }
+
+    private fun init(attrs: AttributeSet?, defStyle: Int) {
+        // Load attributes
+        val a = context.obtainStyledAttributes(
+            attrs, R.styleable.TimerView, defStyle, 0
+        )
+
+        _painter = Paint(ANTI_ALIAS_FLAG).apply {
+            style = Paint.Style.FILL
+            strokeWidth = 10f
+        }
+
+        a.recycle()
     }
 
     fun setListener(listener: TimerViewListener) {
@@ -95,43 +118,32 @@ class TimerView : View {
         val width = MeasureSpec.getSize(widthMeasureSpec)
         val height = MeasureSpec.getSize(heightMeasureSpec)
         val size = if (width > height) height else width
-        Log.i(TAG, "Size: %d".format(size))
+        //Log.i(TAG, "Size: %d".format(size))
         setMeasuredDimension(size, size)
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
+
+        if (!changed) return
+
+        val size = Math.min(width, height)
         _clockRect = RectF(
             paddingLeft.toFloat(),
             paddingTop.toFloat(),
-            (width - (paddingLeft + paddingRight)).toFloat(),
-            (height - (paddingTop + paddingBottom)).toFloat()
+            (size - (paddingLeft + paddingRight)).toFloat(),
+            (size - (paddingTop + paddingBottom)).toFloat()
         )
         val width = 0.05f * _clockRect.width() / 2
         val height = 0.999f * _clockRect.height() / 2
-        _path = Path()
-        _path.moveTo(-width, 0f)
-        _path.lineTo(0f, -height)
-        _path.lineTo(width, 0f)
+        _pointerPath = Path()
+        _pointerPath.moveTo(-width, 0f)
+        _pointerPath.lineTo(0f, -height)
+        _pointerPath.lineTo(width, 0f)
         //_path.arcTo(-width, -width, width, width, 0f, 180f, false)
-        _path.close()
+        _pointerPath.close()
 
         Log.i(TAG, "BBOX: %s".format(_clockRect.toString()))
-    }
-
-    private fun init(attrs: AttributeSet?, defStyle: Int) {
-        // Load attributes
-        val a = context.obtainStyledAttributes(
-            attrs, R.styleable.TimerView, defStyle, 0
-        )
-
-
-        _painter = Paint(ANTI_ALIAS_FLAG).apply {
-            style = Paint.Style.FILL
-            strokeWidth = 10f
-        }
-
-        a.recycle()
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -142,14 +154,25 @@ class TimerView : View {
         _painter.color = _remainingColor
         canvas.drawArc(_clockRect, -90f, 360 * (duration - elapsed), true, _painter)
 
+        val hubRadius = HUB_RADIUS * _clockRect.width()
 
         _painter.color = _pointerColor
-
         canvas.save()
         canvas.translate(_clockRect.centerX(), _clockRect.centerY())
-        canvas.drawCircle(0f, 0f, HUB_RADIUS * _clockRect.width(), _painter)
+        canvas.drawCircle(0f, 0f, hubRadius, _painter)
         canvas.rotate( 360 * (duration - elapsed))
-        canvas.drawPath(_path, _painter)
+        canvas.drawPath(_pointerPath, _painter)
         canvas.restore()
+
+        _overlay.apply {
+            setTint(_bgColor)
+            setBounds(
+                (_clockRect.centerX() - hubRadius).toInt(),
+                (_clockRect.centerY() - hubRadius).toInt(),
+                (_clockRect.centerX() + hubRadius).toInt(),
+                (_clockRect.centerY() + hubRadius).toInt()
+            )
+            draw(canvas)
+        }
     }
 }

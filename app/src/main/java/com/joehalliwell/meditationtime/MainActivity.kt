@@ -3,6 +3,7 @@ package com.joehalliwell.meditationtime
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.SharedPreferences.Editor
+import android.graphics.drawable.Drawable
 import android.media.SoundPool
 import android.os.Bundle
 import android.os.Handler
@@ -36,6 +37,8 @@ class MainActivity : AppCompatActivity(), TimerViewListener, Runnable {
     private lateinit var preferences: SharedPreferences
     private lateinit var soundPool: SoundPool
     private val soundBank = HashMap<Int, Int>()
+    private lateinit var _pauseOverlay: Drawable
+    private lateinit var _playOverlay: Drawable
 
     val timerHandler = Handler()
 
@@ -49,13 +52,21 @@ class MainActivity : AppCompatActivity(), TimerViewListener, Runnable {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        setContentView(R.layout.activity_main)
+
         preferences = PreferenceManager.getDefaultSharedPreferences(this)
 
-        setContentView(R.layout.activity_main)
+        // Remove app name from action bar
+        supportActionBar?.setDisplayShowTitleEnabled(false)
+        supportActionBar?.setDisplayShowHomeEnabled(false)
+
         timerTextView = findViewById<TextView>(R.id.timeTextView)
         extraTimeTextView = findViewById<TextView>(R.id.extraTimeTextView)
         timerView = findViewById<TimerView>(R.id.timerView)
         timerView.setListener(this);
+
+        _pauseOverlay = resources.getDrawable(R.drawable.ic_pause_black_24dp, null)
+        _playOverlay = resources.getDrawable(R.drawable.ic_play_arrow_black_24dp, null)
 
         soundPool = SoundPool.Builder()
             .setMaxStreams(3)
@@ -72,10 +83,6 @@ class MainActivity : AppCompatActivity(), TimerViewListener, Runnable {
         }
 
         reset()
-
-        // Remove app name from action bar
-        supportActionBar?.setDisplayShowTitleEnabled(false)
-        supportActionBar?.setDisplayShowHomeEnabled(false)
     }
 
     override fun onDestroy() {
@@ -122,10 +129,8 @@ class MainActivity : AppCompatActivity(), TimerViewListener, Runnable {
     }
 
     override fun onDialTouch(position: Float) {
-        if (isRunning()) return
-
-        Log.i(TAG, "Got touch at " + position)
-
+        // Only permit a change when stopped
+        if (isRunning() || _elapsed > 0) return
         var d = position
         if (d <= 0) d+= 1.0f
         duration = (maximumDuration * d).roundToLong()
@@ -187,6 +192,7 @@ class MainActivity : AppCompatActivity(), TimerViewListener, Runnable {
         timerView.apply {
             duration = _duration.toFloat() / maximumDuration
             elapsed = _elapsed.toFloat() / maximumDuration
+            overlay = if (isRunning()) _pauseOverlay else _playOverlay
         }
 
         // Update textView
