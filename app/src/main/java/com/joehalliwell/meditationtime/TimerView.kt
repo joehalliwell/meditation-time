@@ -118,14 +118,15 @@ class TimerView : View {
         val width = MeasureSpec.getSize(widthMeasureSpec)
         val height = MeasureSpec.getSize(heightMeasureSpec)
         val size = if (width > height) height else width
-        Log.i(TAG, "Size: %d".format(size))
+        //Log.i(TAG, "Size: %d".format(size))
         setMeasuredDimension(size, size)
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
-
         if (!changed) return
+
+        Log.i(TAG, "Computing new layout")
 
         val size = Math.min(width, height)
         _clockRect = RectF(

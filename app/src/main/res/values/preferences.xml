@@ -1,24 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources>
-<string-array name="durations">
-    <item>10</item>
-    <item>600</item>
-    <item>1200</item>
-    <item>1800</item>
-    <item>2400</item>
-    <item>3000</item>
-    <item>3600</item>
-</string-array>
+    <string name="duration_pk">fullscreen</string>
+    <integer name="duration_default">1200000</integer>
 
-    <string-array name="durationNames">
-        <item>Ten seconds</item>
-        <item>Ten minutes</item>
-        <item>Twenty minutes</item>
-        <item>Half an hour</item>
-        <item>Forty minutes</item>
-        <item>Fifty minutes</item>
-        <item>One hour</item>
-    </string-array>
+    <string name="fullscreen_pk">fullscreen</string>
+    <bool name="fullscreen_default">true</bool>
+
+    <string name="run_on_pk">run_on</string>
+    <bool name="run_on_default">true</bool>
+
+    <string name="interval_bells_pk">interval_bells</string>
+    <bool name="interval_bells_default">true</bool>
 
 </resources>

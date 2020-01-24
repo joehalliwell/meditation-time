@@ -1,39 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen  xmlns:a="http://schemas.android.com/apk/res-auto">
-    <PreferenceCategory
-            a:title="@string/messages_header">
+<PreferenceScreen xmlns:a="http://schemas.android.com/apk/res-auto">
 
-        <ListPreference
-        a:title="Duration"
-        a:key="xduration"
-        a:entries="@array/durationNames"
-        a:entryValues="@array/durations"
-        a:summary="%s"
-        />
+    <SwitchPreference
+        a:title="Full screen"
+        a:summary="Hide Android system bars"
+        a:key="@string/fullscreen_pk"
+        a:defaultValue="@bool/fullscreen_default"/>
+
+    <SwitchPreference
+        a:title="Run past time"
+        a:key="@string/run_on_pk"
+        a:summary="Keep running after the end of the time"
+        a:defaultValue="@bool/run_on_default"/>
 
 
     <SwitchPreference
         a:title="Interval bells"
-        a:key="interval_bells"
-        a:summary="Play four chimes" />
+        a:key="@string/interval_bells_pk"
+        a:summary="Play four chimes"
+        a:defaultValue="@bool/interval_bells_default"/>
 
-    </PreferenceCategory>
-
-    <PreferenceCategory
-            a:title="@string/messages_header">
-
-        <EditTextPreference
-                a:key="signature"
-                a:title="@string/signature_title"
-                />
-
-        <ListPreference
-                a:key="reply"
-                a:title="@string/reply_title"
-                a:entries="@array/reply_entries"
-                a:entryValues="@array/reply_values"
-                a:defaultValue="reply"
-                />
+    <PreferenceCategory a:title="Feedback">
+        <Preference
+            a:title="Send feedback"
+            a:summary="Let us know what you think!"
+        />
 
     </PreferenceCategory>
 

@@ -21,9 +21,6 @@ class MainActivity : AppCompatActivity(), TimerViewListener, Runnable {
 
     val TAG = "MeditationTime"
 
-    private var maximumDuration = 60L * 1000 * 60
-    private var runOn = true
-
     private var _duration = 0L
     private var _segments = 4
 
@@ -34,11 +31,14 @@ class MainActivity : AppCompatActivity(), TimerViewListener, Runnable {
     private lateinit var timerView: TimerView
     private lateinit var timerTextView: TextView
     private lateinit var extraTimeTextView: TextView
-    private lateinit var preferences: SharedPreferences
-    private lateinit var soundPool: SoundPool
-    private val soundBank = HashMap<Int, Int>()
     private lateinit var _pauseOverlay: Drawable
     private lateinit var _playOverlay: Drawable
+
+    private lateinit var preferences: SharedPreferences
+    private var maximumDuration = 60L * 1000 * 60
+
+    private lateinit var soundPool: SoundPool
+    private val soundBank = HashMap<Int, Int>()
 
     val timerHandler = Handler()
 
@@ -49,10 +49,34 @@ class MainActivity : AppCompatActivity(), TimerViewListener, Runnable {
             updateViews()
         }
 
+    val fullscreen: Boolean
+        get() {
+            return preferences.getBoolean(
+                resources.getString(R.string.fullscreen_pk),
+                resources.getBoolean(R.bool.fullscreen_default))
+        }
+
+    val runOn: Boolean
+        get() {
+            return preferences.getBoolean(
+                resources.getString(R.string.run_on_pk),
+                resources.getBoolean(R.bool.run_on_default)
+            )
+        }
+
+    val intervalBells: Boolean
+        get() {
+            return preferences.getBoolean(
+                resources.getString(R.string.interval_bells_pk),
+                resources.getBoolean(R.bool.interval_bells_default)
+            )
+        }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.main_activity)
 
         preferences = PreferenceManager.getDefaultSharedPreferences(this)
 
@@ -77,8 +101,7 @@ class MainActivity : AppCompatActivity(), TimerViewListener, Runnable {
 
         try {
             duration = preferences.getLong("duration", maximumDuration / 3)
-        }
-        catch (ex: ClassCastException) {
+        } catch (ex: ClassCastException) {
             duration = maximumDuration / 3
         }
 
@@ -110,7 +133,7 @@ class MainActivity : AppCompatActivity(), TimerViewListener, Runnable {
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
-        if (hasFocus) hideSystemUI()
+        if (hasFocus && fullscreen) hideSystemUI()
     }
 
     private fun hideSystemUI() {
@@ -121,10 +144,10 @@ class MainActivity : AppCompatActivity(), TimerViewListener, Runnable {
             // hide the navigation bar.
             systemUiVisibility =
                 View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
-                View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
-                View.SYSTEM_UI_FLAG_FULLSCREEN or
-                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
-                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                        View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
+                        View.SYSTEM_UI_FLAG_FULLSCREEN or
+                        View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
+                        View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
         }
     }
 
@@ -132,7 +155,7 @@ class MainActivity : AppCompatActivity(), TimerViewListener, Runnable {
         // Only permit a change when stopped
         if (isRunning() || _elapsed > 0) return
         var d = position
-        if (d <= 0) d+= 1.0f
+        if (d <= 0) d += 1.0f
         duration = (maximumDuration * d).roundToLong()
         Log.i(TAG, "Duration: " + duration)
     }
@@ -158,6 +181,7 @@ class MainActivity : AppCompatActivity(), TimerViewListener, Runnable {
         _elapsed = 0
         pause()
     }
+
     fun resetClickHandler(view: View) = reset()
 
     fun pause() {
@@ -213,16 +237,25 @@ class MainActivity : AppCompatActivity(), TimerViewListener, Runnable {
 
     private fun playSoundForStage(stage: Int) {
         Log.i(TAG, "Playing sound for stage " + stage)
-        if (stage==0) playSound(R.raw.start)
-        else if (stage>0 && stage<_segments) playSound(R.raw.mid)
+        if (stage == 0) playSound(R.raw.start)
         else if (stage == _segments) playSound(R.raw.end)
-        else playSound(R.raw.post)
+
+        if (!intervalBells) return
+
+        if (stage > 0 && stage < _segments) {
+            playSound(R.raw.mid)
+        }
+        else {
+            playSound(R.raw.post)
+        }
     }
 
     private fun playSound(resId: Int) {
         Log.i(TAG, "Playing sound: " + resId)
         soundBank.get(resId)?.let {
-            soundPool.play(it, 1.0f, 1.0f, 0, 0, 1.0f)
+            soundPool.play(it, 0.9f, 0.9f, 0, 0, 1.0f)
         }
     }
+
+
 }
