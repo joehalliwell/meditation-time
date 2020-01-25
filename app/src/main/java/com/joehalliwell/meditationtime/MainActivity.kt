@@ -252,7 +252,7 @@ class MainActivity : AppCompatActivity(), TimerViewListener, Runnable {
 
         if (stage > 0 && stage < _segments) {
             playSound(R.raw.mid)
-        } else {
+        } else if (stage > _segments) {
             playSound(R.raw.post)
         }
     }
