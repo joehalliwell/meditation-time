@@ -4,9 +4,7 @@
 
 - Run over
 - Interval bells on/off
-
 - Fullscreen
-
 - Feedback
 
 - Daily alerts at a given time
