@@ -25,3 +25,4 @@
 ## Features
 
 - Log meditation times
+- Nice shadow effect

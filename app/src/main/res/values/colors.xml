@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#381d2a</color>
-    <color name="colorPrimaryDark">#381d2a</color>
-    <color name="colorAccent">#D81B60</color>
 
     <color name="background">#000000</color>
-    <color name="detail">#e0e0e0</color>
+    <color name="detail">#c0c0c0</color>
     <color name="clockface">#505050</color>
     <color name="timeRemaining">#f40076</color>
 <!--    <color name="timeRemaining">#d09020</color>-->
     <color name="timeTotal">#a0381d2a</color>
+    <color name="iconTint">#F2F2F2</color>
 
 </resources>

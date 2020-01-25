@@ -53,7 +53,8 @@ class MainActivity : AppCompatActivity(), TimerViewListener, Runnable {
         get() {
             return preferences.getBoolean(
                 resources.getString(R.string.fullscreen_pk),
-                resources.getBoolean(R.bool.fullscreen_default))
+                resources.getBoolean(R.bool.fullscreen_default)
+            )
         }
 
     val runOn: Boolean
@@ -89,8 +90,8 @@ class MainActivity : AppCompatActivity(), TimerViewListener, Runnable {
         timerView = findViewById<TimerView>(R.id.timerView)
         timerView.setListener(this);
 
-        _pauseOverlay = resources.getDrawable(R.drawable.ic_pause_black_24dp, null)
-        _playOverlay = resources.getDrawable(R.drawable.ic_play_arrow_black_24dp, null)
+        _pauseOverlay = resources.getDrawable(R.drawable.ic_pause_black_24dp, null).mutate()
+        _playOverlay = resources.getDrawable(R.drawable.ic_play_arrow_black_24dp, null).mutate()
 
         soundPool = SoundPool.Builder()
             .setMaxStreams(3)
@@ -137,27 +138,34 @@ class MainActivity : AppCompatActivity(), TimerViewListener, Runnable {
     }
 
     private fun hideSystemUI() {
+        (1) and 2
+
         window.decorView.apply {
             // Hide both the navigation bar and the status bar.
             // SYSTEM_UI_FLAG_FULLSCREEN is only available on Android 4.1 and higher, but as
             // a general rule, you should design your app to hide the status bar whenever you
             // hide the navigation bar.
-            systemUiVisibility =
-                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
+            systemUiVisibility = (
+                        View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
                         View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
                         View.SYSTEM_UI_FLAG_FULLSCREEN or
-                        View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
+                        //View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
+                        //View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
                         View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                    ) and
+                        View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv() and
+                        View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR.inv()
         }
     }
 
-    override fun onDialTouch(position: Float) {
+    override fun onDialTouch(position: Float): Boolean {
         // Only permit a change when stopped
-        if (isRunning() || _elapsed > 0) return
+        if (isRunning() || _elapsed > 0) return false
         var d = position
         if (d <= 0) d += 1.0f
         duration = (maximumDuration * d).roundToLong()
         Log.i(TAG, "Duration: " + duration)
+        return true
     }
 
     override fun onHubTouch() {
@@ -244,8 +252,7 @@ class MainActivity : AppCompatActivity(), TimerViewListener, Runnable {
 
         if (stage > 0 && stage < _segments) {
             playSound(R.raw.mid)
-        }
-        else {
+        } else {
             playSound(R.raw.post)
         }
     }

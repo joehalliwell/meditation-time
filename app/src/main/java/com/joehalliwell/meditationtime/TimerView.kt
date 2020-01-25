@@ -96,15 +96,18 @@ class TimerView : View {
 
                 if (relX*relX + relY*relY < hub*hub) {
                     if (event.actionMasked == MotionEvent.ACTION_DOWN) _listener?.onHubTouch()
-                    return true
+                    return super.onTouchEvent(event)
                 }
 
                 val quantize = 1.0f
                 val angle =
                     quantize * Math.round(Math.toDegrees(Math.atan2(relX.toDouble(), relY.toDouble())) / quantize)
                 Log.i(TAG, "Angle " + angle)
-                _listener?.onDialTouch(angle/360)
-                return true
+
+                // Gosh this is ugly!
+                if (_listener!=null && !_listener!!.onDialTouch(angle / 360)) {
+                        return true
+                }
             }
         }
 
@@ -135,6 +138,7 @@ class TimerView : View {
             (size - (paddingLeft + paddingRight)).toFloat(),
             (size - (paddingTop + paddingBottom)).toFloat()
         )
+        _clockRect = RectF(0f, 0f, width.toFloat(), height.toFloat())
         val width = 0.05f * _clockRect.width() / 2
         val height = 0.999f * _clockRect.height() / 2
         _pointerPath = Path()

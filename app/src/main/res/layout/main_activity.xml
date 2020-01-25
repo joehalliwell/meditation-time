@@ -5,8 +5,10 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".MainActivity" android:background="@color/background"
-        android:padding="20dp">
+        tools:context=".MainActivity"
+        android:background="@color/background"
+        android:padding="16dp"
+    >
 
     <TextView
             android:text="+"
@@ -14,7 +16,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/extraTimeTextView"
             android:textAlignment="viewEnd"
-            android:textColor="@color/colorAccent"
+            android:textColor="@color/timeRemaining"
             android:textSize="80sp" android:fontFamily="sans-serif-thin"
             app:layout_constraintEnd_toStartOf="@+id/timeTextView"
             app:layout_constraintBaseline_toBaselineOf="@+id/timeTextView"/>
@@ -34,7 +36,10 @@
             app:layout_constraintTop_toBottomOf="@+id/timeTextView"
             android:layout_marginTop="16dp" app:layout_constraintStart_toStartOf="parent"
             android:layout_marginStart="16dp" app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginEnd="16dp"/>
+            android:layout_marginEnd="16dp"
+            android:foreground="@drawable/ripple"
+            android:clickable="true"
+        />
     <Button
             android:id="@+id/go"
             android:text="@string/reset"
