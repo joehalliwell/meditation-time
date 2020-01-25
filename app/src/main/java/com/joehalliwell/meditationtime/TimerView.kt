@@ -22,12 +22,17 @@ class TimerView : View {
 
     // Pre-allocated view stuff
     private lateinit var _clockRect: RectF
-    private lateinit var _pointerPath: Path
+    private val _pointerPath = Path()
+    private val _tempPath = Path()
+    private val _pointerTransform = Matrix()
+
     private lateinit var _painter: Paint
 
     private var _listener: TimerViewListener? = null
     private var _duration = 0.5f
     private var _elapsed = 0f
+
+
 
     private lateinit var _overlay: Drawable
 
@@ -74,13 +79,13 @@ class TimerView : View {
         val a = context.obtainStyledAttributes(
             attrs, R.styleable.TimerView, defStyle, 0
         )
+        a.recycle()
 
         _painter = Paint(ANTI_ALIAS_FLAG).apply {
             style = Paint.Style.FILL
             strokeWidth = 10f
         }
-
-        a.recycle()
+        this.setLayerType(View.LAYER_TYPE_SOFTWARE, null)
     }
 
     fun setListener(listener: TimerViewListener) {
@@ -141,14 +146,17 @@ class TimerView : View {
         _clockRect = RectF(0f, 0f, width.toFloat(), height.toFloat())
         val width = 0.05f * _clockRect.width() / 2
         val height = 0.999f * _clockRect.height() / 2
-        _pointerPath = Path()
+        _pointerPath.reset()
         _pointerPath.moveTo(-width, 0f)
         _pointerPath.lineTo(0f, -height)
         _pointerPath.lineTo(width, 0f)
-        //_path.arcTo(-width, -width, width, width, 0f, 180f, false)
+        //_pointerPath.arcTo(-width, -width, width, width, 0f, 180f, false)
         _pointerPath.close()
 
-        Log.i(TAG, "BBOX: %s".format(_clockRect.toString()))
+        _pointerPath.addCircle(0f, 0f, HUB_RADIUS * size, Path.Direction.CW)
+        _pointerPath.close()
+
+        //Log.i(TAG, "BBOX: %s".format(_clockRect.toString()))
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -159,16 +167,17 @@ class TimerView : View {
         _painter.color = _remainingColor
         canvas.drawArc(_clockRect, -90f, 360 * (duration - elapsed), true, _painter)
 
-        val hubRadius = HUB_RADIUS * _clockRect.width()
 
         _painter.color = _pointerColor
-        canvas.save()
-        canvas.translate(_clockRect.centerX(), _clockRect.centerY())
-        canvas.drawCircle(0f, 0f, hubRadius, _painter)
-        canvas.rotate( 360 * (duration - elapsed))
-        canvas.drawPath(_pointerPath, _painter)
-        canvas.restore()
+        _painter.setShadowLayer(8f, 4f, 4f, 0x80000000.toInt())
+        _pointerTransform.reset()
+        _pointerTransform.postRotate(360 * (duration - elapsed), 0f, 0f)
+        _pointerTransform.postTranslate(_clockRect.centerX(), _clockRect.centerY())
+        _pointerPath.transform(_pointerTransform, _tempPath)
+        canvas.drawPath(_tempPath, _painter)
+        _painter.clearShadowLayer()
 
+        val hubRadius = HUB_RADIUS * _clockRect.width()
         _overlay.apply {
             setTint(_bgColor)
             setBounds(
