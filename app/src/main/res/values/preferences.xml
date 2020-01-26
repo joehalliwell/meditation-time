@@ -5,7 +5,7 @@
     <integer name="duration_default">1200000</integer>
 
     <string name="fullscreen_pk">fullscreen</string>
-    <bool name="fullscreen_default">true</bool>
+    <bool name="fullscreen_default">false</bool>
 
     <string name="run_on_pk">run_on</string>
     <bool name="run_on_default">true</bool>

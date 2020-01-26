@@ -18,6 +18,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.PreferenceManager
 import kotlin.math.roundToLong
 import android.content.res.Configuration.UI_MODE_NIGHT_MASK
+import android.view.WindowManager
 import java.lang.Exception
 
 
@@ -68,7 +69,10 @@ class MainActivity : BaseActivity(), TimerViewListener, Runnable {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.i(TAG, "Creating " + this)
         super.onCreate(savedInstanceState)
+        supportActionBar?.hide()
+
         setContentView(R.layout.main_activity)
 
         timerTextView = findViewById<TextView>(R.id.timeTextView)

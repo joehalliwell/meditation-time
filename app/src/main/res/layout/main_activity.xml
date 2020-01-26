@@ -11,6 +11,16 @@
         android:clipToPadding="false"
         >
 
+    <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/ic_more_vert_black_24dp"
+            android:id="@+id/settingsButton"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:onClick="settingsClickHandler"/>
+
     <TextView
             android:text="+"
             android:layout_width="0dp"
@@ -60,21 +70,11 @@
             app:layout_constraintBottom_toBottomOf="parent"
             />
 
-    <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:srcCompat="@drawable/ic_more_vert_black_24dp"
-            android:id="@+id/settingsButton"
-            android:background="@android:color/transparent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:onClick="settingsClickHandler"/>
-
     <Button
             android:id="@+id/resetButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Reset"
+            android:text="@string/reset_label"
             android:fontFamily="sans-serif"
             android:color="?attr/colorForeground"
             android:scaleType="fitXY"

@@ -4,17 +4,22 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.preference.Preference
 import androidx.preference.PreferenceManager
 import java.lang.Exception
+import android.content.Intent
+
+
 
 open class BaseActivity : AppCompatActivity(),  SharedPreferences.OnSharedPreferenceChangeListener {
 
     val TAG = "MeditationTime"
 
     protected lateinit var preferences: SharedPreferences
+    private var active: Boolean = false
+    private var needThemeUpdate = false
 
     val fullscreen: Boolean
         get() {
@@ -37,25 +42,32 @@ open class BaseActivity : AppCompatActivity(),  SharedPreferences.OnSharedPrefer
         super.onDestroy()
     }
 
-    override fun onWindowFocusChanged(hasFocus: Boolean) {
-        if (hasFocus) configureSystemUi()
-        super.onWindowFocusChanged(hasFocus)
+    override fun onStart() {
+        super.onStart()
+        active = true
+        checkTheme()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        active = false
     }
 
     private fun configureSystemUi() {
         window?.decorView?.apply {
-            var flags = 0
+            var flags = 0 //View.SYSTEM_UI_FLAG_LOW_PROFILE
             if (fullscreen) {
+                window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
                 flags = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
-                        View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
-                        View.SYSTEM_UI_FLAG_FULLSCREEN or
-                        View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
-                        View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
                         View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                        //View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
+                        //View.SYSTEM_UI_FLAG_FULLSCREEN or
+                        //View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
+                        //View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
             }
-            flags = flags or View.SYSTEM_UI_FLAG_LOW_PROFILE
-//            flags = flags and View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv()
-//            flags = flags and View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR.inv()
+            else {
+                window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+            }
             systemUiVisibility = flags
         }
     }
@@ -80,13 +92,33 @@ open class BaseActivity : AppCompatActivity(),  SharedPreferences.OnSharedPrefer
         }
     }
 
+    fun updateTheme() {
+        needThemeUpdate = true
+        checkTheme()
+    }
+
+    private fun checkTheme() {
+        if (active && needThemeUpdate) {
+            recreateWithFade()
+            needThemeUpdate = false
+        }
+    }
+
+    private fun recreateWithFade() {
+        Log.i(TAG, "Recreating " + this)
+        finish()
+        startActivity(Intent(this, javaClass))
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+    }
+
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
-        Log.i(TAG,"Preference updated: " + key)
+        Log.i(TAG,"Preference updated: " + key + " in " + this)
         when (key) {
-            getString(R.string.theme_pk) -> recreate()
-            getString(R.string.night_mode_pk) -> recreate()
+            getString(R.string.theme_pk) -> updateTheme()
+            getString(R.string.night_mode_pk) -> updateTheme()
             getString(R.string.fullscreen_pk) -> configureSystemUi()
         }
     }
+
 
 }

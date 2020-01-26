@@ -1,7 +1,7 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="Base" parent="Theme.AppCompat.DayNight.NoActionBar">
+    <style name="Base" parent="Theme.AppCompat.DayNight">
         <item name="colorAccent">@color/material_deep_teal_500</item>
         <item name="colorForeground">?android:attr/textColorPrimary</item>
         <item name="colorClockface">?android:attr/colorBackgroundFloating</item>
@@ -11,8 +11,6 @@
 
         <item name="colorTimeRemaining">?attr/colorAccent</item>
         <item name="colorTimeTotal">@color/material_deep_teal_200</item>
-
-        <item name="android:windowIsTranslucent">true</item>
     </style>
 
 </resources>
