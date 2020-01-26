@@ -1,54 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:a="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+                  xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory a:title="Behaviour">
-    <SwitchPreference
-        a:title="Full screen"
-        a:summary="Hide Android system bars"
-        a:key="@string/fullscreen_pk"
-        a:defaultValue="@bool/fullscreen_default"
-        a:icon="@drawable/ic_fullscreen_black_24dp"/>
-
-    <SwitchPreference
-        a:title="Run past time"
-        a:key="@string/run_on_pk"
-        a:summary="Keep running after the end of the time"
-        a:defaultValue="@bool/run_on_default"
-        a:icon="@drawable/ic_play_arrow_black_24dp"/>
+        <SwitchPreference
+                a:title="Run past time"
+                a:key="@string/run_on_pk"
+                a:summary="Keep running after the end of the time"
+                a:defaultValue="@bool/run_on_default"
+                a:icon="@drawable/ic_play_arrow_black_24dp"/>
 
 
-    <SwitchPreference
-        a:title="Interval bells"
-        a:key="@string/interval_bells_pk"
-        a:summary="Play four chimes"
-        a:defaultValue="@bool/interval_bells_default"
-        a:icon="@drawable/ic_alarm_black_24dp"/>
-
+        <SwitchPreference
+                a:title="Interval bells"
+                a:key="@string/interval_bells_pk"
+                a:summary="Play four chimes"
+                a:defaultValue="@bool/interval_bells_default"
+                a:icon="@drawable/ic_alarm_black_24dp"/>
     </PreferenceCategory>
 
     <PreferenceCategory a:title="Appearance">
-    <ListPreference
-        a:title="Theme"
-        a:key="@string/theme_pk"
-        android:entries="@array/theme_entries"
-        android:entryValues="@array/theme_values"
-        a:defaultValue="@string/theme_default"
-        a:summary="%s"/>
-    <SwitchPreference
-            a:title="Force night mode"
-            a:key="@string/night_mode_pk"/>
+        <SwitchPreference
+                a:title="Full screen"
+                a:summary="Hide Android system bars"
+                a:key="@string/fullscreen_pk"
+                a:defaultValue="@bool/fullscreen_default"
+                a:icon="@drawable/ic_fullscreen_black_24dp"/>
+        <ListPreference
+                a:title="Theme"
+                a:key="@string/theme_pk"
+                android:entries="@array/theme_entries"
+                android:entryValues="@array/theme_values"
+                a:defaultValue="@string/theme_default"
+                a:summary="%s"/>
+        <SwitchPreference
+                a:title="Force night mode"
+                a:key="@string/night_mode_pk"/>
     </PreferenceCategory>
 
     <PreferenceCategory a:title="Feedback">
         <Preference
-            a:title="Send feedback"
-            a:summary="Let us know what you think"
-            a:icon="@drawable/ic_feedback_black_24dp"
-            >
+                a:title="Send feedback"
+                a:summary="Let us know what you think"
+                a:icon="@drawable/ic_feedback_black_24dp"
+                >
             <intent
-            android:action="android.intent.action.VIEW"
-            android:data="https://play.google.com/store/apps/details?id=com.joehalliwell.meditationtime" />
+                    android:action="android.intent.action.VIEW"
+                    android:data="https://play.google.com/store/apps/details?id=com.joehalliwell.meditationtime"/>
         </Preference>
 
     </PreferenceCategory>
