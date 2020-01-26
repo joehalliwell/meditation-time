@@ -91,12 +91,25 @@ class MainActivity : BaseActivity(), TimerViewListener, Runnable {
         }
 
         try {
-            duration = preferences.getLong("duration", maximumDuration / 3)
+            _duration = preferences.getLong(getString(R.string.duration_pk), maximumDuration / 3)
+            _elapsed = preferences.getLong(getString(R.string.elapsed_pk), 0L)
+            _stage = preferences.getInt(getString(R.string.stage_pk), 0)
         } catch (ex: ClassCastException) {
-            duration = maximumDuration / 3
+            ex.printStackTrace()
         }
+        _start = 0L
+        updateViews()
+        super.onStart()
+    }
 
-        reset()
+    override fun onStop() {
+        preferences.edit().apply() {
+            putLong(getString(R.string.duration_pk), _duration)
+            putLong(getString(R.string.elapsed_pk), _elapsed)
+            putInt(getString(R.string.stage_pk), _stage)
+            commit()
+        }
+        super.onStop()
     }
 
     override fun onDestroy() {
@@ -142,9 +155,6 @@ class MainActivity : BaseActivity(), TimerViewListener, Runnable {
     fun start() {
         if (isRunning()) return
         _start = System.currentTimeMillis()
-        preferences.edit()
-            .putLong(resources.getString(R.string.duration_pk), duration)
-            .commit()
         timerHandler.postDelayed(this, 0)
     }
 

@@ -4,6 +4,9 @@
     <string name="duration_pk">duration</string>
     <integer name="duration_default">1200000</integer>
 
+    <string name="elapsed_pk">elapsed</string>
+    <string name="stage_pk">stage</string>
+
     <string name="fullscreen_pk">fullscreen</string>
     <bool name="fullscreen_default">false</bool>
 
