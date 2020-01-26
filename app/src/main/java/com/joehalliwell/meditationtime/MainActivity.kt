@@ -97,7 +97,7 @@ class MainActivity : BaseActivity(), TimerViewListener, Runnable {
         } catch (ex: ClassCastException) {
             ex.printStackTrace()
         }
-        _start = 0L
+        if (_stage > -1) start()
         updateViews()
         super.onStart()
     }
