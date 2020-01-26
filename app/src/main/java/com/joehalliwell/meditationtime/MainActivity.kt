@@ -50,14 +50,6 @@ class MainActivity : BaseActivity(), TimerViewListener, Runnable {
             updateViews()
         }
 
-    val fullscreen: Boolean
-        get() {
-            return preferences.getBoolean(
-                resources.getString(R.string.fullscreen_pk),
-                resources.getBoolean(R.bool.fullscreen_default)
-            )
-        }
-
     val runOn: Boolean
         get() {
             return preferences.getBoolean(
@@ -123,32 +115,6 @@ class MainActivity : BaseActivity(), TimerViewListener, Runnable {
                 return true
             }
             else -> super.onContextItemSelected(item)
-        }
-    }
-
-    override fun onWindowFocusChanged(hasFocus: Boolean) {
-        super.onWindowFocusChanged(hasFocus)
-        if (hasFocus) {
-            configureSystemUi()
-        }
-    }
-
-
-
-    private fun configureSystemUi() {
-        window.decorView.apply {
-            var flags = 0
-            if (fullscreen) {
-                flags = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
-                        View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
-                        View.SYSTEM_UI_FLAG_FULLSCREEN or
-                        View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
-                        View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
-                        View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-            }
-            flags = flags and View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv()
-            flags = flags and View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR.inv()
-            systemUiVisibility = flags
         }
     }
 
