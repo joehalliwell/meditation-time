@@ -6,7 +6,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceFragmentCompat
 
-class PreferencesActivity : AppCompatActivity() {
+class PreferencesActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,6 +23,5 @@ class PreferencesActivity : AppCompatActivity() {
             setPreferencesFromResource(R.xml.preferences, rootKey)
         }
     }
-
 
 }

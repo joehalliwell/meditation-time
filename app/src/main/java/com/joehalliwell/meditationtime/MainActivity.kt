@@ -21,10 +21,7 @@ import android.content.res.Configuration.UI_MODE_NIGHT_MASK
 import java.lang.Exception
 
 
-class MainActivity : AppCompatActivity(), TimerViewListener, Runnable,
-    SharedPreferences.OnSharedPreferenceChangeListener {
-
-    val TAG = "MeditationTime"
+class MainActivity : BaseActivity(), TimerViewListener, Runnable {
 
     private var _duration = 0L
     private var _segments = 4
@@ -39,7 +36,6 @@ class MainActivity : AppCompatActivity(), TimerViewListener, Runnable,
     private lateinit var _pauseOverlay: Drawable
     private lateinit var _playOverlay: Drawable
 
-    private lateinit var preferences: SharedPreferences
     private var maximumDuration = 60L * 1000 * 60
 
     private lateinit var soundPool: SoundPool
@@ -80,10 +76,6 @@ class MainActivity : AppCompatActivity(), TimerViewListener, Runnable,
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        preferences = PreferenceManager.getDefaultSharedPreferences(this)
-        preferences.registerOnSharedPreferenceChangeListener(this)
-        configureTheme()
-
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity)
 
@@ -113,7 +105,6 @@ class MainActivity : AppCompatActivity(), TimerViewListener, Runnable,
 
     override fun onDestroy() {
         soundPool.release()
-        preferences.unregisterOnSharedPreferenceChangeListener(this)
         return super.onDestroy()
     }
 
@@ -142,33 +133,7 @@ class MainActivity : AppCompatActivity(), TimerViewListener, Runnable,
         }
     }
 
-    private fun configureTheme() {
-        val nightMode = preferences.getBoolean(
-            resources.getString(R.string.night_mode_pk),
-            resources.getBoolean(R.bool.night_mode_default))
-        AppCompatDelegate.setDefaultNightMode(
-            if (nightMode) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO);
 
-        val theme = preferences.getString(
-            resources.getString(R.string.theme_pk),
-            resources.getString(R.string.theme_default)
-        )
-        try {
-            val themeId = resources.getIdentifier(theme, "style", packageName)
-            setTheme(themeId)
-        }
-        catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
-
-    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
-        Log.i(TAG,"Preference updated: " + key)
-        when (key) {
-            getString(R.string.theme_pk) -> recreate()
-            getString(R.string.night_mode_pk) -> recreate()
-        }
-    }
 
     private fun configureSystemUi() {
         window.decorView.apply {
