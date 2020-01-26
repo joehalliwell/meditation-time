@@ -1,12 +1,44 @@
 <resources>
 
+    <attr name="colorClockface" format="color|reference" />
+    <attr name="colorTimeTotal" format="color|reference" />
+    <attr name="colorTimeRemaining" format="color|reference" />
+    <attr name="colorHub" format="color|reference" />
+    <attr name="colorHubOverlay" format="color|reference" />
+    <attr name="colorForeground" format="color|reference" />
+
+
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat">
-        <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/background</item>
-        <item name="colorPrimaryDark">@color/background</item>
-        <item name="colorAccent">@color/timeRemaining</item>
+    <style name="Base" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="colorAccent">@color/material_deep_teal_500</item>
+        <item name="colorForeground">?android:attr/textColorPrimary</item>
+        <item name="colorClockface">?android:attr/colorBackgroundFloating</item>
+
+        <item name="colorHub">?android:attr/colorBackgroundFloating</item>
+        <item name="colorHubOverlay">?android:attr/textColorPrimary</item>
+
+        <item name="colorTimeRemaining">?attr/colorAccent</item>
+        <item name="colorTimeTotal">@color/material_deep_teal_200</item>
+
         <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowDisablePreview">true</item>
+    </style>
+
+    <style name="Teal" parent="Base"></style>
+
+    <style name="Purple" parent="Base">
+        <item name="colorAccent">#9C27B0</item>
+        <item name="colorTimeTotal">#CE93D8</item>
+    </style>
+
+    <style name="Green" parent="Base">
+        <item name="colorAccent">#8BC34A</item>
+        <item name="colorTimeTotal">#C5E1A5</item>
+    </style>
+
+    <style name="Orange" parent="Base">
+        <item name="colorAccent">#FF9800</item>
+        <item name="colorTimeTotal">#FFCC80</item>
     </style>
 
 </resources>

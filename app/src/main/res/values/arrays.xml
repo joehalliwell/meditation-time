@@ -1,12 +1,16 @@
 <resources>
     <!-- Reply Preference -->
-    <string-array name="reply_entries">
-        <item>Reply</item>
-        <item>Reply to all</item>
+    <string-array name="theme_entries">
+        <item>Spring Green</item>
+        <item>Burnt Orange</item>
+        <item>Rich Purple</item>
+        <item>Cool Teal</item>
     </string-array>
 
-    <string-array name="reply_values">
-        <item>reply</item>
-        <item>reply_all</item>
+    <string-array name="theme_values">
+        <item>Green</item>
+        <item>Orange</item>
+        <item>Purple</item>
+        <item>Teal</item>
     </string-array>
 </resources>

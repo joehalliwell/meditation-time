@@ -23,7 +23,7 @@ class TimerView : View {
     // Pre-allocated view stuff
     private lateinit var _clockRect: RectF
     private val _pointerPath = Path()
-    private val _tempPath = Path()
+    private val _pointerPathTransformed = Path()
     private val _pointerTransform = Matrix()
 
     private lateinit var _painter: Paint
@@ -32,14 +32,13 @@ class TimerView : View {
     private var _duration = 0.5f
     private var _elapsed = 0f
 
-
-
     private lateinit var _overlay: Drawable
 
-    @ColorInt private var _bgColor: Int = resources.getColor(R.color.clockface)
-    @ColorInt private var _pointerColor = resources.getColor(R.color.detail)
-    @ColorInt private var _durColor = resources.getColor(R.color.timeTotal)
-    @ColorInt private var _remainingColor = resources.getColor(R.color.timeRemaining)
+    @ColorInt private var _colorClockface: Int = 0
+    @ColorInt private var _colorHub: Int = 0
+    @ColorInt private var _colorTimeTotal: Int = 0
+    @ColorInt private var _colorTimeRemaining: Int = 0
+    @ColorInt private var _colorHubOverlay: Int = 0
 
     var duration: Float
         get() = _duration
@@ -76,14 +75,21 @@ class TimerView : View {
 
     private fun init(attrs: AttributeSet?, defStyle: Int) {
         // Load attributes
-        val a = context.obtainStyledAttributes(
-            attrs, R.styleable.TimerView, defStyle, 0
-        )
-        a.recycle()
+        val a = context.obtainStyledAttributes(attrs, R.styleable.TimerView, defStyle, 0).apply {
+            try {
+                _colorClockface = getColor(R.styleable.TimerView_clockface, Color.WHITE)
+                _colorHub = getColor(R.styleable.TimerView_hub, Color.BLUE)
+                _colorTimeTotal = getColor(R.styleable.TimerView_timeTotal, Color.RED)
+                _colorTimeRemaining = getColor(R.styleable.TimerView_timeRemaining, Color.YELLOW)
+                _colorHubOverlay = getColor(R.styleable.TimerView_hubOverlay, Color.WHITE)
+            } finally {
+                recycle()
+            }
+        }
 
         _painter = Paint(ANTI_ALIAS_FLAG).apply {
             style = Paint.Style.FILL
-            strokeWidth = 10f
+            strokeWidth = 20f
         }
         this.setLayerType(View.LAYER_TYPE_SOFTWARE, null)
     }
@@ -136,19 +142,23 @@ class TimerView : View {
 
         Log.i(TAG, "Computing new layout")
 
-        val size = Math.min(width, height)
+        val size = Math.min(width - paddingLeft - paddingRight, height - paddingTop - paddingBottom)
+
         _clockRect = RectF(
-            paddingLeft.toFloat(),
-            paddingTop.toFloat(),
-            (size - (paddingLeft + paddingRight)).toFloat(),
-            (size - (paddingTop + paddingBottom)).toFloat()
+            (width - size)/2.0f,
+            (height - size)/2.0f,
+            (width + size)/2.0f,
+            (height + size)/2.0f
         )
-        _clockRect = RectF(0f, 0f, width.toFloat(), height.toFloat())
-        val width = 0.05f * _clockRect.width() / 2
-        val height = 0.999f * _clockRect.height() / 2
+
+
+        //_clockRect = RectF(0f, 0f, width.toFloat(), height.toFloat())
+        val width  = 0.02f * _clockRect.width()
+        val height = 0.50f * _clockRect.height()
         _pointerPath.reset()
         _pointerPath.moveTo(-width, 0f)
-        _pointerPath.lineTo(0f, -height)
+        _pointerPath.lineTo(-0.25f * width, -height)
+        _pointerPath.lineTo(+0.25f * width, -height)
         _pointerPath.lineTo(width, 0f)
         //_pointerPath.arcTo(-width, -width, width, width, 0f, 180f, false)
         _pointerPath.close()
@@ -156,30 +166,32 @@ class TimerView : View {
         _pointerPath.addCircle(0f, 0f, HUB_RADIUS * size, Path.Direction.CW)
         _pointerPath.close()
 
-        //Log.i(TAG, "BBOX: %s".format(_clockRect.toString()))
+        Log.i(TAG, "BBOX: %s".format(_clockRect.toString()))
     }
 
     override fun onDraw(canvas: Canvas) {
-        _painter.color = _bgColor //Color.valueOf(0.2f, 0.2f, 0.2f, 1.0f).toArgb()
+        _painter.color = _colorClockface //Color.valueOf(0.2f, 0.2f, 0.2f, 1.0f).toArgb()
+        _painter.setShadowLayer(8f, 0f, 4f, 0x80404040.toInt())
         canvas.drawArc(_clockRect, 0f, 360f, true, _painter)
-        _painter.color = _durColor
+        _painter.clearShadowLayer()
+
+        _painter.color = _colorTimeTotal
         canvas.drawArc(_clockRect, -90f, 360 * duration, true, _painter)
-        _painter.color = _remainingColor
+        _painter.color = _colorTimeRemaining
         canvas.drawArc(_clockRect, -90f, 360 * (duration - elapsed), true, _painter)
 
-
-        _painter.color = _pointerColor
-        _painter.setShadowLayer(8f, 4f, 4f, 0x80000000.toInt())
+        _painter.color = _colorHub
+        _painter.setShadowLayer(8f, 0f, 4f, 0x80404040.toInt())
         _pointerTransform.reset()
         _pointerTransform.postRotate(360 * (duration - elapsed), 0f, 0f)
         _pointerTransform.postTranslate(_clockRect.centerX(), _clockRect.centerY())
-        _pointerPath.transform(_pointerTransform, _tempPath)
-        canvas.drawPath(_tempPath, _painter)
+        _pointerPath.transform(_pointerTransform, _pointerPathTransformed)
+        canvas.drawPath(_pointerPathTransformed, _painter)
         _painter.clearShadowLayer()
 
         val hubRadius = HUB_RADIUS * _clockRect.width()
-        _overlay.apply {
-            setTint(_bgColor)
+        _overlay?.apply {
+            setTint(_colorHubOverlay)
             setBounds(
                 (_clockRect.centerX() - hubRadius).toInt(),
                 (_clockRect.centerY() - hubRadius).toInt(),

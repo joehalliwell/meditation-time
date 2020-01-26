@@ -3,6 +3,7 @@ package com.joehalliwell.meditationtime
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.SharedPreferences.Editor
+import android.content.res.Configuration
 import android.graphics.drawable.Drawable
 import android.media.SoundPool
 import android.os.Bundle
@@ -13,11 +14,15 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.PreferenceManager
 import kotlin.math.roundToLong
+import android.content.res.Configuration.UI_MODE_NIGHT_MASK
+import java.lang.Exception
 
 
-class MainActivity : AppCompatActivity(), TimerViewListener, Runnable {
+class MainActivity : AppCompatActivity(), TimerViewListener, Runnable,
+    SharedPreferences.OnSharedPreferenceChangeListener {
 
     val TAG = "MeditationTime"
 
@@ -75,20 +80,17 @@ class MainActivity : AppCompatActivity(), TimerViewListener, Runnable {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        setContentView(R.layout.main_activity)
-
         preferences = PreferenceManager.getDefaultSharedPreferences(this)
+        preferences.registerOnSharedPreferenceChangeListener(this)
+        configureTheme()
 
-        // Remove app name from action bar
-        supportActionBar?.setDisplayShowTitleEnabled(false)
-        supportActionBar?.setDisplayShowHomeEnabled(false)
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.main_activity)
 
         timerTextView = findViewById<TextView>(R.id.timeTextView)
         extraTimeTextView = findViewById<TextView>(R.id.extraTimeTextView)
         timerView = findViewById<TimerView>(R.id.timerView)
-        timerView.setListener(this);
+        timerView.setListener(this)
 
         _pauseOverlay = resources.getDrawable(R.drawable.ic_pause_black_24dp, null).mutate()
         _playOverlay = resources.getDrawable(R.drawable.ic_play_arrow_black_24dp, null).mutate()
@@ -111,6 +113,7 @@ class MainActivity : AppCompatActivity(), TimerViewListener, Runnable {
 
     override fun onDestroy() {
         soundPool.release()
+        preferences.unregisterOnSharedPreferenceChangeListener(this)
         return super.onDestroy()
     }
 
@@ -134,27 +137,53 @@ class MainActivity : AppCompatActivity(), TimerViewListener, Runnable {
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
-        if (hasFocus && fullscreen) hideSystemUI()
+        if (hasFocus) {
+            configureSystemUi()
+        }
     }
 
-    private fun hideSystemUI() {
-        (1) and 2
+    private fun configureTheme() {
+        val nightMode = preferences.getBoolean(
+            resources.getString(R.string.night_mode_pk),
+            resources.getBoolean(R.bool.night_mode_default))
+        AppCompatDelegate.setDefaultNightMode(
+            if (nightMode) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO);
 
+        val theme = preferences.getString(
+            resources.getString(R.string.theme_pk),
+            resources.getString(R.string.theme_default)
+        )
+        try {
+            val themeId = resources.getIdentifier(theme, "style", packageName)
+            setTheme(themeId)
+        }
+        catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+        Log.i(TAG,"Preference updated: " + key)
+        when (key) {
+            getString(R.string.theme_pk) -> recreate()
+            getString(R.string.night_mode_pk) -> recreate()
+        }
+    }
+
+    private fun configureSystemUi() {
         window.decorView.apply {
-            // Hide both the navigation bar and the status bar.
-            // SYSTEM_UI_FLAG_FULLSCREEN is only available on Android 4.1 and higher, but as
-            // a general rule, you should design your app to hide the status bar whenever you
-            // hide the navigation bar.
-            systemUiVisibility = (
-                        View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
+            var flags = 0
+            if (fullscreen) {
+                flags = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
                         View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
                         View.SYSTEM_UI_FLAG_FULLSCREEN or
-                        //View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
-                        //View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
+                        View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
+                        View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
                         View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                    ) and
-                        View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv() and
-                        View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR.inv()
+            }
+            flags = flags and View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv()
+            flags = flags and View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR.inv()
+            systemUiVisibility = flags
         }
     }
 
@@ -178,9 +207,9 @@ class MainActivity : AppCompatActivity(), TimerViewListener, Runnable {
     fun start() {
         if (isRunning()) return
         _start = System.currentTimeMillis()
-        val editor: Editor = preferences.edit()
-        editor.putLong("duration", duration)
-        editor.commit()
+        preferences.edit()
+            .putLong(resources.getString(R.string.duration_pk), duration)
+            .commit()
         timerHandler.postDelayed(this, 0)
     }
 
@@ -190,12 +219,17 @@ class MainActivity : AppCompatActivity(), TimerViewListener, Runnable {
         pause()
     }
 
-    fun resetClickHandler(view: View) = reset()
-
     fun pause() {
         _start = 0
         timerHandler.removeCallbacks(this)
         updateViews()
+    }
+
+
+    fun resetClickHandler(view: View) = reset()
+    fun settingsClickHandler(view: View) {
+        val intent = Intent(this, PreferencesActivity::class.java)
+        startActivity(intent)
     }
 
     override fun run() {
@@ -228,8 +262,8 @@ class MainActivity : AppCompatActivity(), TimerViewListener, Runnable {
         }
 
         // Update textView
-        timerTextView.setText(getHoursAndMinutes(_duration, _elapsed))
-        extraTimeTextView.setText(if (_elapsed > _duration) "+" else "")
+        timerTextView.text = getHoursAndMinutes(_duration, _elapsed)
+        extraTimeTextView.text = if (_elapsed > _duration) "+" else ""
     }
 
     private fun getHoursAndMinutes(duration: Long, elapsed: Long): String {

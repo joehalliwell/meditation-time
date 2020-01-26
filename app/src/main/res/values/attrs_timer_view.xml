@@ -1,8 +1,10 @@
 <resources>
     <declare-styleable name="TimerView">
         <attr name="clockface" format="color|reference" />
-        <attr name="totalTime" format="color|reference" />
-        <attr name="remainingTime" format="color|reference" />
-        <attr name="hubOverlay" format="reference" />
+        <attr name="timeTotal" format="color|reference" />
+        <attr name="timeRemaining" format="color|reference" />
+        <attr name="hub" format="color|reference" />
+        <attr name="hubOverlay" format="color|reference" />
+        <attr name="shadow" format="color|reference" />
     </declare-styleable>
 </resources>

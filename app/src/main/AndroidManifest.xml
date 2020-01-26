@@ -8,10 +8,9 @@
             android:label="Meditation Time"
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
-            android:theme="@style/AppTheme">
+            android:theme="@style/Green">
         <activity
                 android:name=".MainActivity"
-                android:theme="@style/AppTheme"
                 android:screenOrientation="portrait"
         >
             <intent-filter>

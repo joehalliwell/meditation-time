@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources>
-    <string name="duration_pk">fullscreen</string>
+    <string name="duration_pk">duration</string>
     <integer name="duration_default">1200000</integer>
 
     <string name="fullscreen_pk">fullscreen</string>
@@ -13,4 +13,9 @@
     <string name="interval_bells_pk">interval_bells</string>
     <bool name="interval_bells_default">true</bool>
 
+    <string name="theme_pk">theme</string>
+    <string name="theme_default">Green</string>
+
+    <string name="night_mode_pk">night_mode</string>
+    <bool name="night_mode_default">false</bool>
 </resources>
