@@ -176,7 +176,7 @@ class MainActivity : BaseActivity(), TimerViewListener, Runnable {
         _start = 0
         timerHandler.removeCallbacks(this)
         updateViews()
-        wakeLock.release()
+        if (wakeLock.isHeld) wakeLock.release()
     }
 
 
