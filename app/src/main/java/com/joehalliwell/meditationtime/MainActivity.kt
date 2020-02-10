@@ -1,5 +1,6 @@
 package com.joehalliwell.meditationtime
 
+import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.SharedPreferences.Editor
@@ -18,6 +19,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.PreferenceManager
 import kotlin.math.roundToLong
 import android.content.res.Configuration.UI_MODE_NIGHT_MASK
+import android.os.PowerManager
 import android.view.WindowManager
 import java.lang.Exception
 
@@ -42,7 +44,8 @@ class MainActivity : BaseActivity(), TimerViewListener, Runnable {
     private lateinit var soundPool: SoundPool
     private val soundBank = HashMap<Int, Int>()
 
-    val timerHandler = Handler()
+    private val timerHandler = Handler()
+    private lateinit var wakeLock: PowerManager.WakeLock
 
     var duration: Long
         get() = (_duration)
@@ -88,6 +91,10 @@ class MainActivity : BaseActivity(), TimerViewListener, Runnable {
             .build()
         for (resId in arrayOf(R.raw.start, R.raw.mid, R.raw.end, R.raw.post)) {
             soundBank[resId] = soundPool.load(this, resId, 1)
+        }
+
+        wakeLock = (getSystemService(Context.POWER_SERVICE) as PowerManager).run {
+            newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG)
         }
 
         try {
@@ -154,6 +161,7 @@ class MainActivity : BaseActivity(), TimerViewListener, Runnable {
 
     fun start() {
         if (isRunning()) return
+        wakeLock.acquire()
         _start = System.currentTimeMillis()
         timerHandler.postDelayed(this, 0)
     }
@@ -168,6 +176,7 @@ class MainActivity : BaseActivity(), TimerViewListener, Runnable {
         _start = 0
         timerHandler.removeCallbacks(this)
         updateViews()
+        wakeLock.release()
     }
 
 
