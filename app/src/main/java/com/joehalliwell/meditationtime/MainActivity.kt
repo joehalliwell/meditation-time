@@ -45,7 +45,6 @@ class MainActivity : BaseActivity(), TimerViewListener, Runnable {
     private val soundBank = HashMap<Int, Int>()
 
     private val timerHandler = Handler()
-    private lateinit var wakeLock: PowerManager.WakeLock
 
     var duration: Long
         get() = (_duration)
@@ -91,10 +90,6 @@ class MainActivity : BaseActivity(), TimerViewListener, Runnable {
             .build()
         for (resId in arrayOf(R.raw.start, R.raw.mid, R.raw.end, R.raw.post)) {
             soundBank[resId] = soundPool.load(this, resId, 1)
-        }
-
-        wakeLock = (getSystemService(Context.POWER_SERVICE) as PowerManager).run {
-            newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG)
         }
 
         try {
@@ -161,9 +156,9 @@ class MainActivity : BaseActivity(), TimerViewListener, Runnable {
 
     fun start() {
         if (isRunning()) return
-        wakeLock.acquire()
         _start = System.currentTimeMillis()
         timerHandler.postDelayed(this, 0)
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }
 
     fun reset() {
@@ -176,7 +171,7 @@ class MainActivity : BaseActivity(), TimerViewListener, Runnable {
         _start = 0
         timerHandler.removeCallbacks(this)
         updateViews()
-        if (wakeLock.isHeld) wakeLock.release()
+        window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }
 
 
