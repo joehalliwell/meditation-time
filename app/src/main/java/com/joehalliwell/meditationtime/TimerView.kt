@@ -34,11 +34,16 @@ class TimerView : View {
 
     private lateinit var _overlay: Drawable
 
-    @ColorInt private var _colorClockface: Int = 0
-    @ColorInt private var _colorHub: Int = 0
-    @ColorInt private var _colorTimeTotal: Int = 0
-    @ColorInt private var _colorTimeRemaining: Int = 0
-    @ColorInt private var _colorHubOverlay: Int = 0
+    @ColorInt
+    private var _colorClockface: Int = 0
+    @ColorInt
+    private var _colorHub: Int = 0
+    @ColorInt
+    private var _colorTimeTotal: Int = 0
+    @ColorInt
+    private var _colorTimeRemaining: Int = 0
+    @ColorInt
+    private var _colorHubOverlay: Int = 0
 
     var duration: Float
         get() = _duration
@@ -105,19 +110,17 @@ class TimerView : View {
                 val relY = _clockRect.centerY() - event.y
                 val hub = HUB_RADIUS * width
 
-                if (relX*relX + relY*relY < hub*hub) {
+                if (relX * relX + relY * relY < hub * hub) {
                     if (event.actionMasked == MotionEvent.ACTION_DOWN) _listener?.onHubTouch()
                     return super.onTouchEvent(event)
                 }
 
-                val quantize = 1.0f
-                val angle =
-                    quantize * Math.round(Math.toDegrees(Math.atan2(relX.toDouble(), relY.toDouble())) / quantize)
+                val angle = Math.toDegrees(Math.atan2(relX.toDouble(), relY.toDouble()))
                 Log.i(TAG, "Angle " + angle)
 
                 // Gosh this is ugly!
-                if (_listener!=null && !_listener!!.onDialTouch(angle / 360)) {
-                        return true
+                if (_listener != null && !_listener!!.onDialTouch(angle / 360)) {
+                    return true
                 }
             }
         }
@@ -145,15 +148,15 @@ class TimerView : View {
         val size = Math.min(width - paddingLeft - paddingRight, height - paddingTop - paddingBottom)
 
         _clockRect = RectF(
-            (width - size)/2.0f,
-            (height - size)/2.0f,
-            (width + size)/2.0f,
-            (height + size)/2.0f
+            (width - size) / 2.0f,
+            (height - size) / 2.0f,
+            (width + size) / 2.0f,
+            (height + size) / 2.0f
         )
 
 
         //_clockRect = RectF(0f, 0f, width.toFloat(), height.toFloat())
-        val width  = 0.02f * _clockRect.width()
+        val width = 0.02f * _clockRect.width()
         val height = 0.50f * _clockRect.height()
         _pointerPath.reset()
         _pointerPath.moveTo(-width, 0f)

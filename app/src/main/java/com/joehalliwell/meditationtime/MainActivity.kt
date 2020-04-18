@@ -1,10 +1,6 @@
 package com.joehalliwell.meditationtime
 
-import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
-import android.content.SharedPreferences.Editor
-import android.content.res.Configuration
 import android.graphics.drawable.Drawable
 import android.media.SoundPool
 import android.os.Bundle
@@ -14,14 +10,8 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
-import androidx.preference.PreferenceManager
 import kotlin.math.roundToLong
-import android.content.res.Configuration.UI_MODE_NIGHT_MASK
-import android.os.PowerManager
 import android.view.WindowManager
-import java.lang.Exception
 
 
 class MainActivity : BaseActivity(), TimerViewListener, Runnable {
@@ -137,12 +127,15 @@ class MainActivity : BaseActivity(), TimerViewListener, Runnable {
         }
     }
 
-    override fun onDialTouch(position: Float): Boolean {
+    override fun onDialTouch(angle: Double): Boolean {
         // Only permit a change when stopped
         if (isRunning() || _elapsed > 0) return false
-        var d = position
-        if (d <= 0) d += 1.0f
-        duration = (maximumDuration * d).roundToLong()
+
+        val quantize = 1.0 / 60.0;
+        var quantized = Math.round(angle / quantize) * quantize
+        if (quantized < 0) quantized += 1
+
+        duration = (maximumDuration * quantized).roundToLong()
         Log.i(TAG, "Duration: " + duration)
         return true
     }
