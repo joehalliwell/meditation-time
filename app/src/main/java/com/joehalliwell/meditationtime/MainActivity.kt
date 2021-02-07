@@ -1,5 +1,7 @@
 package com.joehalliwell.meditationtime
 
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.media.SoundPool
@@ -43,6 +45,9 @@ class MainActivity : BaseActivity(), TimerViewListener, Runnable {
             updateViews()
         }
 
+    /**
+     * Should the timer run on at the end of the session?
+     */
     val runOn: Boolean
         get() {
             return preferences.getBoolean(
@@ -51,6 +56,9 @@ class MainActivity : BaseActivity(), TimerViewListener, Runnable {
             )
         }
 
+    /**
+     * Should interval bells be sounded?
+     */
     val intervalBells: Boolean
         get() {
             return preferences.getBoolean(
@@ -58,7 +66,6 @@ class MainActivity : BaseActivity(), TimerViewListener, Runnable {
                 resources.getBoolean(R.bool.interval_bells_default)
             )
         }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.i(TAG, "Creating " + this)
@@ -239,6 +246,5 @@ class MainActivity : BaseActivity(), TimerViewListener, Runnable {
             soundPool.play(it, 0.9f, 0.9f, 0, 0, 1.0f)
         }
     }
-
 
 }

@@ -11,8 +11,9 @@ import androidx.preference.PreferenceManager
 import java.lang.Exception
 import android.content.Intent
 
-
-
+/**
+ * Base class for themeable activities
+ */
 open class BaseActivity : AppCompatActivity(),  SharedPreferences.OnSharedPreferenceChangeListener {
 
     val TAG = "MeditationTime"
