@@ -80,7 +80,7 @@ class TimerView : View {
 
     private fun init(attrs: AttributeSet?, defStyle: Int) {
         // Load attributes
-        val a = context.obtainStyledAttributes(attrs, R.styleable.TimerView, defStyle, 0).apply {
+        context.obtainStyledAttributes(attrs, R.styleable.TimerView, defStyle, 0).apply {
             try {
                 _colorClockface = getColor(R.styleable.TimerView_clockface, Color.WHITE)
                 _colorHub = getColor(R.styleable.TimerView_hub, Color.BLUE)

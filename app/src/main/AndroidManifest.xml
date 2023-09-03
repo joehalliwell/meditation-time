@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.joehalliwell.meditationtime">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <application
-            android:allowBackup="true"
-            android:icon="@mipmap/ic_launcher"
-            android:label="Meditation Time"
-            android:roundIcon="@mipmap/ic_launcher_round"
-            android:supportsRtl="true"
-            android:theme="@style/Green">
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="Meditation Time"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Green">
         <activity
-                android:name=".MainActivity"
-                android:screenOrientation="portrait"
-                android:launchMode="singleTop"
+            android:name=".MainActivity"
+            android:screenOrientation="portrait"
+            android:launchMode="singleTop"
+            android:exported="true"
         >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -20,9 +20,10 @@
             </intent-filter>
         </activity>
         <activity
-                android:name=".PreferencesActivity"
-                android:label="Settings"
-                android:parentActivityName=".MainActivity"
+            android:name=".PreferencesActivity"
+            android:label="Settings"
+            android:parentActivityName=".MainActivity"
+            android:exported="true"
         />
     </application>
 </manifest>
